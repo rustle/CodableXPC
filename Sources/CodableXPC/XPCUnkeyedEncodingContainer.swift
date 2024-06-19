@@ -15,198 +15,223 @@
 import XPC
 
 public struct XPCUnkeyedEncodingContainer: UnkeyedEncodingContainer {
-    // MARK: - Properties
     public var codingPath: [CodingKey] {
-        get {
-            return self.encoder.codingPath
-        }
+        encoder.codingPath
     }
 
     public var count: Int {
-        get {
-            return xpc_array_get_count(underlyingMessage)
-        }
+        xpc_array_get_count(underlyingMessage)
     }
 
     private let encoder: XPCEncoder
 
     private let underlyingMessage: xpc_object_t
 
-    // MARK: - Initialization
-    init(referencing encoder: XPCEncoder, wrapping underlyingMessage: xpc_object_t) throws {
+    init(referencing encoder: XPCEncoder,
+         wrapping underlyingMessage: xpc_object_t) throws {
         self.encoder = encoder
 
         guard xpc_get_type(underlyingMessage) == XPC_TYPE_ARRAY else {
-            throw XPCEncodingHelpers.makeEncodingError(underlyingMessage, encoder.codingPath, "Internal error")
+            throw XPCEncodingHelpers.makeEncodingError(underlyingMessage,
+                                                       encoder.codingPath,
+                                                       "Internal error")
         }
 
         self.underlyingMessage = underlyingMessage
     }
 
     // MARK: - UnkeyedEncodingContainer protocol methods
+
     public mutating func encode(_ value: Bool) throws {
-        self.encoder.codingPath.append(XPCCodingKey(intValue: self.count - 1)!)
-        defer { self.encoder.codingPath.removeLast() }
+        encoder.codingPath.append(XPCCodingKey(intValue: count - 1)!)
+        defer { encoder.codingPath.removeLast() }
 
         let boolValue = XPCEncodingHelpers.encodeBool(value)
-        xpc_array_append_value(self.underlyingMessage, boolValue)
+        xpc_array_append_value(underlyingMessage,
+                               boolValue)
     }
 
     public mutating func encodeNil() throws {
-        self.encoder.codingPath.append(XPCCodingKey(intValue: self.count - 1)!)
-        defer { self.encoder.codingPath.removeLast() }
+        encoder.codingPath.append(XPCCodingKey(intValue: count - 1)!)
+        defer { encoder.codingPath.removeLast() }
 
         let nilValue = XPCEncodingHelpers.encodeNil()
-        xpc_array_append_value(self.underlyingMessage, nilValue)
+        xpc_array_append_value(underlyingMessage,
+                               nilValue)
     }
 
     public mutating func encode(_ value: String) throws {
-        self.encoder.codingPath.append(XPCCodingKey(intValue: self.count - 1)!)
-        defer { self.encoder.codingPath.removeLast() }
+        encoder.codingPath.append(XPCCodingKey(intValue: count - 1)!)
+        defer { encoder.codingPath.removeLast() }
 
         let stringValue = XPCEncodingHelpers.encodeString(value)
-        xpc_array_append_value(self.underlyingMessage, stringValue)
+        xpc_array_append_value(underlyingMessage,
+                               stringValue)
     }
 
     public mutating func encode(_ value: Double) throws {
-        self.encoder.codingPath.append(XPCCodingKey(intValue: self.count - 1)!)
-        defer { self.encoder.codingPath.removeLast() }
+        encoder.codingPath.append(XPCCodingKey(intValue: count - 1)!)
+        defer { encoder.codingPath.removeLast() }
 
         let doubleValue = XPCEncodingHelpers.encodeDouble(value)
-        xpc_array_append_value(self.underlyingMessage, doubleValue)
+        xpc_array_append_value(underlyingMessage,
+                               doubleValue)
     }
 
     public mutating func encode(_ value: Float) throws {
-        self.encoder.codingPath.append(XPCCodingKey(intValue: self.count - 1)!)
-        defer { self.encoder.codingPath.removeLast() }
+        encoder.codingPath.append(XPCCodingKey(intValue: count - 1)!)
+        defer { encoder.codingPath.removeLast() }
 
         let floatValue = XPCEncodingHelpers.encodeFloat(value)
-        xpc_array_append_value(self.underlyingMessage, floatValue)
+        xpc_array_append_value(underlyingMessage,
+                               floatValue)
     }
 
     public mutating func encode(_ value: Int) throws {
-        self.encoder.codingPath.append(XPCCodingKey(intValue: self.count - 1)!)
-        defer { self.encoder.codingPath.removeLast() }
+        encoder.codingPath.append(XPCCodingKey(intValue: count - 1)!)
+        defer { encoder.codingPath.removeLast() }
 
         let intValue = XPCEncodingHelpers.encodeSignedInteger(value)
-        xpc_array_append_value(self.underlyingMessage, intValue)
+        xpc_array_append_value(underlyingMessage,
+                               intValue)
     }
 
     public mutating func encode(_ value: Int8) throws {
-        self.encoder.codingPath.append(XPCCodingKey(intValue: self.count - 1)!)
-        defer { self.encoder.codingPath.removeLast() }
+        encoder.codingPath.append(XPCCodingKey(intValue: count - 1)!)
+        defer { encoder.codingPath.removeLast() }
 
         let intValue = XPCEncodingHelpers.encodeSignedInteger(value)
-        xpc_array_append_value(self.underlyingMessage, intValue)
+        xpc_array_append_value(underlyingMessage,
+                               intValue)
     }
 
     public mutating func encode(_ value: Int16) throws {
-        self.encoder.codingPath.append(XPCCodingKey(intValue: self.count - 1)!)
-        defer { self.encoder.codingPath.removeLast() }
+        encoder.codingPath.append(XPCCodingKey(intValue: count - 1)!)
+        defer { encoder.codingPath.removeLast() }
 
         let intValue = XPCEncodingHelpers.encodeSignedInteger(value)
-        xpc_array_append_value(self.underlyingMessage, intValue)
+        xpc_array_append_value(underlyingMessage,
+                               intValue)
     }
 
     public mutating func encode(_ value: Int32) throws {
-        self.encoder.codingPath.append(XPCCodingKey(intValue: self.count - 1)!)
-        defer { self.encoder.codingPath.removeLast() }
+        encoder.codingPath.append(XPCCodingKey(intValue: count - 1)!)
+        defer { encoder.codingPath.removeLast() }
 
         let intValue = XPCEncodingHelpers.encodeSignedInteger(value)
-        xpc_array_append_value(self.underlyingMessage, intValue)
+        xpc_array_append_value(underlyingMessage,
+                               intValue)
     }
 
     public mutating func encode(_ value: Int64) throws {
-        self.encoder.codingPath.append(XPCCodingKey(intValue: self.count - 1)!)
-        defer { self.encoder.codingPath.removeLast() }
+        encoder.codingPath.append(XPCCodingKey(intValue: count - 1)!)
+        defer { encoder.codingPath.removeLast() }
 
         let intValue = XPCEncodingHelpers.encodeSignedInteger(value)
-        xpc_array_append_value(self.underlyingMessage, intValue)
+        xpc_array_append_value(underlyingMessage,
+                               intValue)
     }
 
     public mutating func encode(_ value: UInt) throws {
-        self.encoder.codingPath.append(XPCCodingKey(intValue: self.count - 1)!)
-        defer { self.encoder.codingPath.removeLast() }
+        encoder.codingPath.append(XPCCodingKey(intValue: count - 1)!)
+        defer { encoder.codingPath.removeLast() }
 
         let unsignedValue = XPCEncodingHelpers.encodeUnsignedInteger(value)
-        xpc_array_append_value(self.underlyingMessage, unsignedValue)
+        xpc_array_append_value(underlyingMessage,
+                               unsignedValue)
     }
 
     public mutating func encode(_ value: UInt8) throws {
-        self.encoder.codingPath.append(XPCCodingKey(intValue: self.count - 1)!)
-        defer { self.encoder.codingPath.removeLast() }
+        encoder.codingPath.append(XPCCodingKey(intValue: count - 1)!)
+        defer { encoder.codingPath.removeLast() }
 
         let unsignedValue = XPCEncodingHelpers.encodeUnsignedInteger(value)
-        xpc_array_append_value(self.underlyingMessage, unsignedValue)
+        xpc_array_append_value(underlyingMessage,
+                               unsignedValue)
     }
 
     public mutating func encode(_ value: UInt16) throws {
-        self.encoder.codingPath.append(XPCCodingKey(intValue: self.count - 1)!)
-        defer { self.encoder.codingPath.removeLast() }
+        encoder.codingPath.append(XPCCodingKey(intValue: count - 1)!)
+        defer { encoder.codingPath.removeLast() }
 
         let unsignedValue = XPCEncodingHelpers.encodeUnsignedInteger(value)
-        xpc_array_append_value(self.underlyingMessage, unsignedValue)
+        xpc_array_append_value(underlyingMessage,
+                               unsignedValue)
     }
 
     public mutating func encode(_ value: UInt32) throws {
-        self.encoder.codingPath.append(XPCCodingKey(intValue: self.count - 1)!)
-        defer { self.encoder.codingPath.removeLast() }
+        encoder.codingPath.append(XPCCodingKey(intValue: count - 1)!)
+        defer { encoder.codingPath.removeLast() }
 
         let unsignedValue = XPCEncodingHelpers.encodeUnsignedInteger(value)
-        xpc_array_append_value(self.underlyingMessage, unsignedValue)
+        xpc_array_append_value(underlyingMessage,
+                               unsignedValue)
     }
 
     public mutating func encode(_ value: UInt64) throws {
-        self.encoder.codingPath.append(XPCCodingKey(intValue: self.count - 1)!)
-        defer { self.encoder.codingPath.removeLast() }
+        encoder.codingPath.append(XPCCodingKey(intValue: count - 1)!)
+        defer { encoder.codingPath.removeLast() }
 
         let unsignedValue = XPCEncodingHelpers.encodeUnsignedInteger(value)
-        xpc_array_append_value(self.underlyingMessage, unsignedValue)
+        xpc_array_append_value(underlyingMessage,
+                               unsignedValue)
     }
 
     public mutating func encode<T: Encodable>(_ value: T) throws {
-        self.encoder.codingPath.append(XPCCodingKey(intValue: self.count - 1)!)
-        defer { self.encoder.codingPath.removeLast() }
+        encoder.codingPath.append(XPCCodingKey(intValue: count - 1)!)
+        defer { encoder.codingPath.removeLast() }
 
         do {
-            let xpcObject = try XPCEncoder.encode(value, at: self.encoder.codingPath)
-            xpc_array_append_value(self.underlyingMessage, xpcObject)
+            let xpcObject = try XPCEncoder.encode(value,
+                                                  at: encoder.codingPath)
+            xpc_array_append_value(underlyingMessage,
+                                   xpcObject)
         } catch let error as EncodingError {
             throw error
         } catch {
-            throw XPCEncodingHelpers.makeEncodingError(value, self.codingPath, String(describing: error))
+            throw XPCEncodingHelpers.makeEncodingError(value, codingPath,
+                                                       String(describing: error))
         }
     }
 
-    public mutating func nestedContainer<NestedKey>(keyedBy keyType: NestedKey.Type) -> KeyedEncodingContainer<NestedKey> where NestedKey : CodingKey {
-        self.encoder.codingPath.append(XPCCodingKey(intValue: self.count - 1)!)
-        defer { self.encoder.codingPath.removeLast() }
+    public mutating func nestedContainer<NestedKey>(keyedBy keyType: NestedKey.Type) -> KeyedEncodingContainer<NestedKey> where NestedKey: CodingKey {
+        encoder.codingPath.append(XPCCodingKey(intValue: count - 1)!)
+        defer { encoder.codingPath.removeLast() }
 
-        let xpcDictionary = xpc_dictionary_create(nil, nil, 0)
-        xpc_array_append_value(self.underlyingMessage, xpcDictionary)
+        let xpcDictionary = xpc_dictionary_create(nil,
+                                                  nil,
+                                                  0)
+        xpc_array_append_value(underlyingMessage,
+                               xpcDictionary)
 
-        //It is OK to force this because we are explicitly passing a dictionary
-        let container = try! XPCKeyedEncodingContainer<NestedKey>(referencing: self.encoder, wrapping: xpcDictionary)
+        // It is OK to force this because we are explicitly passing a dictionary
+        let container = try! XPCKeyedEncodingContainer<NestedKey>(referencing: encoder,
+                                                                  wrapping: xpcDictionary)
         return KeyedEncodingContainer(container)
     }
 
     public mutating func nestedUnkeyedContainer() -> UnkeyedEncodingContainer {
-        self.encoder.codingPath.append(XPCCodingKey(intValue: self.count - 1)!)
-        defer { self.encoder.codingPath.removeLast() }
+        encoder.codingPath.append(XPCCodingKey(intValue: count - 1)!)
+        defer { encoder.codingPath.removeLast() }
 
-        let xpcArray = xpc_array_create(nil, 0)
-        xpc_array_append_value(self.underlyingMessage, xpcArray)
+        let xpcArray = xpc_array_create(nil,
+                                        0)
+        xpc_array_append_value(underlyingMessage,
+                               xpcArray)
 
-        return try! XPCUnkeyedEncodingContainer(referencing: self.encoder, wrapping: xpcArray)
+        return try! XPCUnkeyedEncodingContainer(referencing: encoder,
+                                                wrapping: xpcArray)
     }
 
     public mutating func superEncoder() -> Encoder {
-        self.encoder.codingPath.append(XPCCodingKey(intValue: self.count - 1)!)
-        defer { self.encoder.codingPath.removeLast() }
+        encoder.codingPath.append(XPCCodingKey(intValue: count - 1)!)
+        defer { encoder.codingPath.removeLast() }
 
         // Insert dummy value in array so we don't get bit later
-        xpc_array_append_value(self.underlyingMessage, XPCEncodingHelpers.encodeNil())
-        return XPCArrayReferencingEncoder(at: self.codingPath, wrapping: self.underlyingMessage, forIndex: self.count - 1)
+        xpc_array_append_value(underlyingMessage, XPCEncodingHelpers.encodeNil())
+        return XPCArrayReferencingEncoder(at: codingPath,
+                                          wrapping: underlyingMessage,
+                                          forIndex: count - 1)
     }
 }
 
@@ -219,37 +244,52 @@ private class XPCArrayReferencingEncoder: XPCEncoder {
     let xpcArray: xpc_object_t
     let index: Int
 
-    init(at codingPath: [CodingKey], wrapping array: xpc_object_t, forIndex index: Int) {
-        self.xpcArray = array
+    init(at codingPath: [CodingKey],
+         wrapping array: xpc_object_t,
+         forIndex index: Int) {
+        xpcArray = array
         self.index = index
         super.init(at: codingPath)
     }
 
-    override func container<Key>(keyedBy type: Key.Type) -> KeyedEncodingContainer<Key> where Key : CodingKey {
-        let newDictionary = xpc_dictionary_create(nil, nil, 0)
-        xpc_array_set_value(self.xpcArray, self.index, newDictionary)
+    override func container<Key>(keyedBy type: Key.Type) -> KeyedEncodingContainer<Key> where Key: CodingKey {
+        let newDictionary = xpc_dictionary_create(nil,
+                                                  nil,
+                                                  0)
+        xpc_array_set_value(xpcArray,
+                            index,
+                            newDictionary)
 
         // It is OK to force this through because we are explicitly passing a dictionary
-        let container = try! XPCKeyedEncodingContainer<Key>(referencing: self, wrapping: newDictionary)
+        let container = try! XPCKeyedEncodingContainer<Key>(referencing: self,
+                                                            wrapping: newDictionary)
         return KeyedEncodingContainer(container)
     }
 
     override func unkeyedContainer() -> UnkeyedEncodingContainer {
-        let newArray = xpc_array_create(nil, 0)
-        xpc_array_set_value(self.xpcArray, self.index, newArray)
+        let newArray = xpc_array_create(nil,
+                                        0)
+        xpc_array_set_value(xpcArray,
+                            index,
+                            newArray)
 
         // It is OK to force this through because we are explicitly passing an array
-        return try! XPCUnkeyedEncodingContainer(referencing: self, wrapping: newArray)
+        return try! XPCUnkeyedEncodingContainer(referencing: self,
+                                                wrapping: newArray)
     }
 
     override func singleValueContainer() -> SingleValueEncodingContainer {
         // It is OK to force this through because we are explictly passing an array
-        return XPCSingleValueEncodingContainer(referencing: self, insertionClosure: {
-            value in
-                guard self.index < xpc_array_get_count(self.xpcArray) else {
-                    throw XPCEncodingHelpers.makeEncodingError(value, [], "Internal Error")
-                }
-                xpc_array_set_value(self.xpcArray, self.index, value)
+        return XPCSingleValueEncodingContainer(referencing: self,
+                                               insertionClosure: { value in
+            guard self.index < xpc_array_get_count(self.xpcArray) else {
+                throw XPCEncodingHelpers.makeEncodingError(value,
+                                                           [],
+                                                           "Internal Error")
+            }
+            xpc_array_set_value(self.xpcArray,
+                                self.index,
+                                value)
         })
     }
 }

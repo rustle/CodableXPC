@@ -3,7 +3,7 @@
 //
 // Licensed under Apache License v2.0 with Runtime Library Exception
 //
-//===----------------------------------------------------------------------===//
+// ===----------------------------------------------------------------------===//
 
 import XCTest
 import Foundation
@@ -22,6 +22,7 @@ final class CodableXPCTests: XCTestCase {
     }
 
     // MARK: - Encoding Top-Level Single-Value Types
+
     func testEncodingTopLevelSingleValueEnum() {
         _testRoundTrip(of: Switch.off)
         _testRoundTrip(of: Switch.on)
@@ -36,6 +37,7 @@ final class CodableXPCTests: XCTestCase {
     }
 
     // MARK: - Encoding Top-Level Structured Types
+
     func testEncodingTopLevelStructuredStruct() {
         // Address is a struct type with multiple fields.
         let address = Address.testValue
@@ -89,7 +91,7 @@ final class CodableXPCTests: XCTestCase {
 
         do {
             _ = try XPCEncoder.encode(toEncode)
-        } catch EncodingError.invalidValue(let (_, context)) {
+        } catch let EncodingError.invalidValue(_, context) {
             XCTAssertEqual(1, context.codingPath.count)
             XCTAssertEqual("key", context.codingPath[0].stringValue)
         } catch {
@@ -102,7 +104,7 @@ final class CodableXPCTests: XCTestCase {
 
         do {
             _ = try XPCEncoder.encode(toEncode)
-        } catch EncodingError.invalidValue(let (_, context)) {
+        } catch let EncodingError.invalidValue(_, context) {
             XCTAssertEqual(3, context.codingPath.count)
             XCTAssertEqual("key", context.codingPath[0].stringValue)
             XCTAssertEqual("sub_key", context.codingPath[1].stringValue)
@@ -122,7 +124,7 @@ final class CodableXPCTests: XCTestCase {
 
         do {
             _ = try XPCDecoder.decode(DecodeFailure.self, message: input)
-        } catch DecodingError.typeMismatch(let (_, context)) {
+        } catch let DecodingError.typeMismatch(_, context) {
             XCTAssertEqual(1, context.codingPath.count)
             XCTAssertEqual("intValue", context.codingPath[0].stringValue)
         } catch {
@@ -143,36 +145,17 @@ final class CodableXPCTests: XCTestCase {
 
         do {
             _ = try XPCDecoder.decode(DecodeFailureNested.self, message: input)
-        } catch DecodingError.typeMismatch(let (_, context)) {
+        } catch let DecodingError.typeMismatch(_, context) {
             XCTAssertEqual(2, context.codingPath.count)
             XCTAssertEqual("intValue", context.codingPath[1].stringValue)
         } catch {
             XCTFail("Unexpected error: \(String(describing: error))")
         }
     }
-
-    static var allTests = [
-      ("testEncodingTopLevelEmptyStruct", testEncodingTopLevelEmptyStruct),
-      ("testEncodingTopLevelSingleValueEnum", testEncodingTopLevelSingleValueEnum),
-      ("testEncodingTopLevelSingleValueStruct", testEncodingTopLevelSingleValueStruct),
-      ("testEncodingTopLevelSingleValueClass", testEncodingTopLevelSingleValueClass),
-      ("testEncodingTopLevelStructuredStruct", testEncodingTopLevelStructuredStruct),
-      ("testEncodingTopLevelStructuredClass", testEncodingTopLevelStructuredClass),
-      ("testEncodingTopLevelStructuredSingleStruct", testEncodingTopLevelStructuredSingleStruct),
-      ("testEncodingTopLevelStructuredSingleClass", testEncodingTopLevelStructuredSingleClass),
-      ("testEncodingDerivedClass", testEncodingDerivedClass),
-      ("testEncodingClassWhichSharesEncoderWithSuper", testEncodingClassWhichSharesEncoderWithSuper),
-      ("testEncodingTopLevelDeepStructuredType", testEncodingTopLevelDeepStructuredType),
-      ("testEncodingTopLevelNullableType", testEncodingTopLevelNullableType),
-      ("testEncodingDictionaryFailureKeyPath", testEncodingDictionaryFailureKeyPath),
-      ("testEncodingDictionaryFailureKeyPathNested", testEncodingDictionaryFailureKeyPathNested),
-      ("testDecodingDictionaryFailureKeyPath", testDecodingDictionaryFailureKeyPath),
-      ("testDecodingDictionaryFailureKeyPathNested", testDecodingDictionaryFailureKeyPathNested),
-    ]
 }
 
 // MARK: - Testing helpers
-private func _testRoundTrip<T>(of value: T) where T : Codable, T: Equatable {
+private func _testRoundTrip<T>(of value: T) where T: Codable, T: Equatable {
     var payload: xpc_object_t! = nil
     do {
         payload = try XPCEncoder.encode(value)
@@ -192,12 +175,12 @@ private func _testRoundTrip<T>(of value: T) where T : Codable, T: Equatable {
 /* FIXME: Import from %S/Inputs/Coding/SharedTypes.swift somehow. */
 
 // MARK: - Empty helper types for testing
-fileprivate struct EmptyStruct : Codable, Equatable {}
-fileprivate struct EmptyClass : Codable, Equatable {}
+fileprivate struct EmptyStruct: Codable, Equatable {}
+fileprivate struct EmptyClass: Codable, Equatable {}
 
 // MARK: - Single-Value Types
 /// A simple on-off switch type that encodes as a single Bool value.
-fileprivate enum Switch : Codable {
+fileprivate enum Switch: Codable {
     case off
     case on
 
@@ -219,7 +202,7 @@ fileprivate enum Switch : Codable {
 }
 
 /// A simple timestamp type that encodes as a single Double value.
-fileprivate struct Timestamp : Codable, Equatable {
+fileprivate struct Timestamp: Codable, Equatable {
   let value: Double
 
   init(_ value: Double) {
@@ -238,7 +221,7 @@ fileprivate struct Timestamp : Codable, Equatable {
 }
 
 /// A simple referential counter type that encodes as a single Int value.
-fileprivate final class Counter : Codable, Equatable {
+fileprivate final class Counter: Codable, Equatable {
   var count: Int = 0
 
   init() {}
@@ -260,20 +243,12 @@ fileprivate final class Counter : Codable, Equatable {
 
 // MARK: - Structured Types
 /// A simple address type that encodes as a dictionary of values.
-fileprivate struct Address : Codable, Equatable {
+fileprivate struct Address: Codable, Equatable {
     let street: String
     let city: String
     let state: String
     let zipCode: Int
     let country: String
-
-    init(street: String, city: String, state: String, zipCode: Int, country: String) {
-        self.street = street
-        self.city = city
-        self.state = state
-        self.zipCode = zipCode
-        self.country = country
-    }
 
     static var testValue: Address {
         return Address(street: "1 Infinite Loop",
@@ -285,7 +260,7 @@ fileprivate struct Address : Codable, Equatable {
 }
 
 /// A simple person class that encodes as a dictionary of values.
-fileprivate class Person : Codable, Equatable {
+fileprivate class Person: Codable, Equatable {
   let name: String
   let email: String
   let website: URL?
@@ -296,7 +271,7 @@ fileprivate class Person : Codable, Equatable {
     self.website = website
   }
 
-  private enum CodingKeys : String, CodingKey {
+  private enum CodingKeys: String, CodingKey {
     case name
     case email
     case website
@@ -333,7 +308,7 @@ fileprivate class Person : Codable, Equatable {
 }
 
 /// A type which encodes as an array directly through a single value container.
-struct Numbers : Codable, Equatable {
+struct Numbers: Codable, Equatable {
   let values = [4, 8, 15, 16, 23, 42]
 
   init() {}
@@ -357,16 +332,16 @@ struct Numbers : Codable, Equatable {
 }
 
 /// A type which encodes as a dictionary directly through a single value container.
-fileprivate final class Mapping : Codable, Equatable {
-  let values: [String : URL]
+fileprivate final class Mapping: Codable, Equatable {
+  let values: [String: URL]
 
-  init(values: [String : URL]) {
+  init(values: [String: URL]) {
     self.values = values
   }
 
   init(from decoder: Decoder) throws {
     let container = try decoder.singleValueContainer()
-    values = try container.decode([String : URL].self)
+    values = try container.decode([String: URL].self)
   }
 
   func encode(to encoder: Encoder) throws {
@@ -385,7 +360,7 @@ fileprivate final class Mapping : Codable, Equatable {
 }
 
 /// A derived class
-fileprivate class Programmer : Person {
+fileprivate class Programmer: Person {
     let favoriteIDE: String
 
     init(name: String, email: String, website: URL? = nil, favoriteIDE: String) {
@@ -405,7 +380,7 @@ fileprivate class Programmer : Person {
         try super.encode(to: container.superEncoder())
     }
 
-    enum CodingKeys : String, CodingKey {
+    enum CodingKeys: String, CodingKey {
         case favoriteIDE
     }
 
@@ -423,7 +398,7 @@ fileprivate class Programmer : Person {
 }
 
 /// A class which shares its encoder and decoder with its superclass.
-fileprivate class Employee : Person {
+fileprivate class Employee: Person {
   let id: Int
 
   init(name: String, email: String, website: URL? = nil, id: Int) {
@@ -431,7 +406,7 @@ fileprivate class Employee : Person {
     super.init(name: name, email: email, website: website)
   }
 
-  enum CodingKeys : String, CodingKey {
+  enum CodingKeys: String, CodingKey {
     case id
   }
 
@@ -465,14 +440,9 @@ fileprivate class Employee : Person {
 }
 
 /// A simple company struct which encodes as a dictionary of nested values.
-fileprivate struct Company : Codable, Equatable {
+fileprivate struct Company: Codable, Equatable {
     let address: Address
     var employees: [Employee]
-
-    init(address: Address, employees: [Employee]) {
-        self.address = address
-        self.employees = employees
-    }
 
     static var testValue: Company {
         return Company(address: Address.testValue, employees: [Employee.testValue, Employee.testValue2])
@@ -480,7 +450,7 @@ fileprivate struct Company : Codable, Equatable {
 }
 
 /// An enum type which decodes from Bool?.
-fileprivate enum EnhancedBool : Codable {
+fileprivate enum EnhancedBool: Codable {
     case `true`
     case `false`
     case fileNotFound
@@ -505,7 +475,7 @@ fileprivate enum EnhancedBool : Codable {
     }
 }
 
-fileprivate struct EncodeFailure : Encodable {
+fileprivate struct EncodeFailure: Encodable {
     enum Failure: Error {
         case Failure
     }
@@ -516,14 +486,14 @@ fileprivate struct EncodeFailure : Encodable {
     }
 }
 
-fileprivate struct EncodeFailureNested : Encodable {
+fileprivate struct EncodeFailureNested: Encodable {
     var nestedValue: EncodeFailure
 }
 
-private struct DecodeFailure : Decodable {
+private struct DecodeFailure: Decodable {
     var intValue: Int
 }
 
-private struct DecodeFailureNested : Decodable {
+private struct DecodeFailureNested: Decodable {
     var nestedValue: DecodeFailure
 }

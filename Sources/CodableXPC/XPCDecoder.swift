@@ -12,32 +12,38 @@
 
 import XPC
 
-open class XPCDecoder: Decoder {
+public class XPCDecoder: Decoder {
     private let underlyingMessage: xpc_object_t
 
     public var codingPath: [CodingKey]
 
-    public var userInfo: [CodingUserInfoKey : Any] = [:]
+    public var userInfo: [CodingUserInfoKey: Any] = [:]
 
-    public init(withUnderlyingMessage message: xpc_object_t, at codingPath: [CodingKey] = []) {
+    public init(withUnderlyingMessage message: xpc_object_t,
+                at codingPath: [CodingKey] = []) {
         self.underlyingMessage = message
         self.codingPath = codingPath
     }
 
-    public func container<Key>(keyedBy type: Key.Type) throws -> KeyedDecodingContainer<Key> where Key : CodingKey {
+    public func container<Key>(
+        keyedBy type: Key.Type
+    ) throws -> KeyedDecodingContainer<Key> where Key: CodingKey {
         let container = try XPCKeyedDecodingContainer<Key>(referencing: self, wrapping: self.underlyingMessage)
         return KeyedDecodingContainer(container)
     }
 
     public func unkeyedContainer() throws -> UnkeyedDecodingContainer {
-        return try XPCUnkeyedDecodingContainer(referencing: self, wrapping: self.underlyingMessage)
+        try XPCUnkeyedDecodingContainer(referencing: self,
+                                        wrapping: underlyingMessage)
     }
 
     public func singleValueContainer() throws -> SingleValueDecodingContainer {
-        return XPCSingleValueDecodingContainer(referencing: self, wrapping: self.underlyingMessage)
+        XPCSingleValueDecodingContainer(referencing: self,
+                                        wrapping: underlyingMessage)
     }
 
-    public static func decode<T: Decodable>(_ type: T.Type, message xpcObject: xpc_object_t) throws -> T {
+    public static func decode<T: Decodable>(_ type: T.Type,
+                                            message xpcObject: xpc_object_t) throws -> T {
         return try T(from: XPCDecoder(withUnderlyingMessage: xpcObject))
     }
 }

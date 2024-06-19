@@ -13,23 +13,21 @@
 import XPC
 
 public struct XPCSingleValueEncodingContainer: SingleValueEncodingContainer {
-    // MARK: - Properties
     public var codingPath: [CodingKey] {
-        get {
-            return self.encoder.codingPath
-        }
+        encoder.codingPath
     }
 
     private let encoder: XPCEncoder
-    private let insertionClosure: (_ value: xpc_object_t) throws -> ()
+    private let insertionClosure: (_ value: xpc_object_t) throws -> Void
 
-    // MARK: - Initialization
-    init(referencing encoder: XPCEncoder, insertionClosure: @escaping (_ value: xpc_object_t) throws -> ()) {
+    init(referencing encoder: XPCEncoder,
+         insertionClosure: @escaping (_ value: xpc_object_t) throws -> Void) {
         self.encoder = encoder
         self.insertionClosure = insertionClosure
     }
 
     // MARK: - SingleValueEncodingContainer protocol methods
+
     public mutating func encodeNil() throws {
         try self.insertionClosure(XPCEncodingHelpers.encodeNil())
     }
@@ -91,7 +89,8 @@ public struct XPCSingleValueEncodingContainer: SingleValueEncodingContainer {
     }
 
     public mutating func encode<T: Encodable>(_ value: T) throws {
-        let xpcObject = try XPCEncoder.encode(value, at: self.encoder.codingPath)
-        try self.insertionClosure(xpcObject)
+        let xpcObject = try XPCEncoder.encode(value,
+                                              at: encoder.codingPath)
+        try insertionClosure(xpcObject)
     }
 }

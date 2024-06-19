@@ -22,7 +22,7 @@ public class XPCEncoder: Encoder {
 
     public var codingPath: [CodingKey]
 
-    public var userInfo: [CodingUserInfoKey : Any] = [:]
+    public var userInfo: [CodingUserInfoKey: Any] = [:]
 
     var topLevelContainer: xpc_object_t?
 
@@ -32,7 +32,7 @@ public class XPCEncoder: Encoder {
         self.codingPath = codingPath
     }
 
-    public func container<Key>(keyedBy type: Key.Type) -> KeyedEncodingContainer<Key> where Key : CodingKey {
+    public func container<Key>(keyedBy type: Key.Type) -> KeyedEncodingContainer<Key> where Key: CodingKey {
         switch self.containerKind {
         case .noContainer:
             self.topLevelContainer = xpc_dictionary_create(nil, nil, 0)
@@ -44,7 +44,8 @@ public class XPCEncoder: Encoder {
         }
 
         // It is OK to force this because we are explicitly passing a dictionary
-        let container = try! XPCKeyedEncodingContainer<Key>(referencing: self, wrapping: self.topLevelContainer!)
+        let container = try! XPCKeyedEncodingContainer<Key>(referencing: self,
+                                                            wrapping: self.topLevelContainer!)
         return KeyedEncodingContainer(container)
     }
 
@@ -59,8 +60,9 @@ public class XPCEncoder: Encoder {
             preconditionFailure("This encoder already has a container of kind \(self.containerKind)")
         }
 
-        //It is OK to force this through becasue we are explicitly passing an array
-        return try! XPCUnkeyedEncodingContainer(referencing: self, wrapping: self.topLevelContainer!)
+        // It is OK to force this through becasue we are explicitly passing an array
+        return try! XPCUnkeyedEncodingContainer(referencing: self,
+                                                wrapping: self.topLevelContainer!)
     }
 
     public func singleValueContainer() -> SingleValueEncodingContainer {
@@ -71,7 +73,8 @@ public class XPCEncoder: Encoder {
             preconditionFailure("This encoder already has a container of kind \(self.containerKind)")
         }
 
-        return XPCSingleValueEncodingContainer(referencing: self, insertionClosure: {
+        return XPCSingleValueEncodingContainer(referencing: self,
+                                               insertionClosure: {
             self.topLevelContainer = $0
         })
     }
@@ -85,37 +88,37 @@ public class XPCEncoder: Encoder {
 
 enum XPCEncodingHelpers {
     static func encodeNil() -> xpc_object_t {
-        return xpc_null_create()
+        xpc_null_create()
     }
 
     static func encodeBool(_ value: Bool) -> xpc_object_t {
-        return xpc_bool_create(value)
+        xpc_bool_create(value)
     }
 
     static func encodeSignedInteger<I: SignedInteger & FixedWidthInteger>(_ value: I) -> xpc_object_t {
-        return xpc_int64_create(Int64(value))
+        xpc_int64_create(Int64(value))
     }
 
     static func encodeUnsignedInteger<U: UnsignedInteger & FixedWidthInteger>(_ value: U) -> xpc_object_t {
-        return xpc_uint64_create(UInt64(value))
+        xpc_uint64_create(UInt64(value))
     }
 
     static func encodeDouble(_ value: Double) -> xpc_object_t {
-        return xpc_double_create(Double(value))
+        xpc_double_create(Double(value))
     }
 
     static func encodeFloat(_ value: Float) -> xpc_object_t {
-        return xpc_double_create(Double(value))
+        xpc_double_create(Double(value))
     }
 
     static func encodeString(_ value: String) -> xpc_object_t {
-        return value.withCString({ return xpc_string_create($0) })
+        value.withCString({ return xpc_string_create($0) })
     }
 
     static func makeEncodingError(_ value: Any, _ codingPath: [CodingKey],
                                   _ debugDescription: String) -> EncodingError {
-        return EncodingError.invalidValue(value,
-                                          EncodingError.Context(codingPath: codingPath,
-                                                                debugDescription: debugDescription))
+        EncodingError.invalidValue(value,
+                                   EncodingError.Context(codingPath: codingPath,
+                                                         debugDescription: debugDescription))
     }
 }

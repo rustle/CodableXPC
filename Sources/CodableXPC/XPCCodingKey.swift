@@ -12,10 +12,13 @@
 import XPC
 
 public struct XPCCodingKey: CodingKey {
+    static let superKey = XPCCodingKey(intValue: 0,
+                                       stringValue: "super")
+
     public let stringValue: String
 
     public init?(stringValue: String) {
-        self.intValue = nil
+        intValue = nil
         self.stringValue = stringValue
     }
 
@@ -23,13 +26,12 @@ public struct XPCCodingKey: CodingKey {
 
     public init?(intValue: Int) {
         self.intValue = intValue
-        self.stringValue = String(intValue)
+        stringValue = String(intValue)
     }
 
-    public init(intValue: Int, stringValue: String) {
+    public init(intValue: Int,
+                stringValue: String) {
         self.intValue = intValue
         self.stringValue = stringValue
     }
-
-    internal static let superKey = XPCCodingKey(intValue: 0, stringValue: "super")
 }
